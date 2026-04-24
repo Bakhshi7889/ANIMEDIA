@@ -17,7 +17,6 @@ export interface WatchProgress {
 
 interface CachedImage {
   url: string;
-  blob: Blob;
   type: 'character' | 'movie';
   lastUsed: number;
 }
@@ -65,54 +64,55 @@ export async function initDB() {
 }
 
 // --- Image Caching ---
-export async function getCachedImage(url: string, type: 'character' | 'movie'): Promise<string> {
-  const localDb = await initDB();
-  const cached = await localDb.get('imageCache', url);
-  
-  if (cached) {
-    // Update lastUsed
-    await localDb.put('imageCache', { ...cached, lastUsed: Date.now() });
-    return URL.createObjectURL(cached.blob);
-  }
-
-  // Fetch and cache
+export async function updateImageMetadata(url: string, type: 'character' | 'movie'): Promise<void> {
   try {
-    const response = await fetch(url);
-    const blob = await response.blob();
+    const localDb = await initDB();
     await localDb.put('imageCache', {
       url,
-      blob,
       type,
       lastUsed: Date.now()
     });
-    return URL.createObjectURL(blob);
-  } catch (error) {
-    return url; // Fallback to network URL
+  } catch (err) {
+    console.error('Failed to update image metadata', err);
   }
 }
 
 export async function cleanupImages() {
-  const localDb = await initDB();
-  const tx = localDb.transaction('imageCache', 'readwrite');
-  const index = tx.store.index('by-lastUsed');
-  
-  const now = Date.now();
-  const ONE_DAY = 24 * 60 * 60 * 1000;
-  const SEVEN_DAYS = 7 * ONE_DAY;
-
-  let cursor = await index.openCursor();
-  while (cursor) {
-    const item = cursor.value;
-    const age = now - item.lastUsed;
+  try {
+    const localDb = await initDB();
+    const tx = localDb.transaction('imageCache', 'readwrite');
+    const index = tx.store.index('by-lastUsed');
     
-    const shouldDelete = 
-      (item.type === 'character' && age > ONE_DAY) ||
-      (item.type === 'movie' && age > SEVEN_DAYS);
+    const now = Date.now();
+    const ONE_DAY = 24 * 60 * 60 * 1000;
+    const SEVEN_DAYS = 7 * ONE_DAY;
 
-    if (shouldDelete) {
-      await cursor.delete();
+    let cursor = await index.openCursor();
+    const urlsToDelete: string[] = [];
+
+    while (cursor) {
+      const item = cursor.value;
+      const age = now - item.lastUsed;
+      
+      const shouldDelete = 
+        (item.type === 'character' && age > ONE_DAY) ||
+        (item.type === 'movie' && age > SEVEN_DAYS);
+
+      if (shouldDelete) {
+        urlsToDelete.push(item.url);
+        await cursor.delete();
+      }
+      cursor = await cursor.continue();
     }
-    cursor = await cursor.continue();
+    
+    if (urlsToDelete.length > 0 && 'caches' in window) {
+      const cache = await caches.open('tmdb-images');
+      for (const url of urlsToDelete) {
+        await cache.delete(url);
+      }
+    }
+  } catch (err) {
+    console.error('Failed to cleanup images', err);
   }
 }
 

@@ -80,20 +80,17 @@ const InstallPrompt = () => {
             {isIOS ? (
               <div className="space-y-3">
                 <p className="text-[11px] text-white/70 leading-relaxed">
-                  Install this app on your iPhone for a native experience.
+                  Install this app on your iPhone for the cinematic native experience.
                 </p>
                 <div className="bg-white/5 rounded-xl p-3 flex flex-col gap-2">
                   <div className="flex items-center gap-2 text-[10px] text-white/60">
                     <span className="flex items-center justify-center w-5 h-5 rounded-md bg-white/10 text-white"><Share size={12} /></span>
-                    1. Tap the Share button below
+                    1. Tap the Share button (Safari bottom, Chrome top-right)
                   </div>
                   <div className="flex items-center gap-2 text-[10px] text-white/60">
                     <span className="flex items-center justify-center w-5 h-5 rounded-md bg-white/10 text-white"><PlusSquare size={12} /></span>
                     2. Select 'Add to Home Screen'
                   </div>
-                </div>
-                <div className="flex justify-center pt-2">
-                  <ChevronUp className="text-blue-500 animate-bounce" size={20} />
                 </div>
               </div>
             ) : (

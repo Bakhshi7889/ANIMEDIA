@@ -6,6 +6,7 @@ import { MovieCardSkeleton } from "../components/Skeleton";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { cn } from "../lib/utils";
 import { motion, AnimatePresence } from "motion/react";
+import CachedImage from "../components/CachedImage";
 
 // A hook to use query params
 function useQuery() {
@@ -217,9 +218,10 @@ export default function Search() {
                       className="group flex items-center gap-4 p-3 rounded-2xl hover:bg-white/5 transition-all active:scale-95"
                     >
                       <div className="w-12 h-16 rounded-xl bg-[#222] overflow-hidden shrink-0 shadow-lg border border-white/5">
-                        <img 
+                        <CachedImage 
                           src={getImageUrl(item.poster_path || (item as any).profile_path, 'w92')} 
                           alt={item.title || item.name} 
+                          type={item.media_type === 'person' ? 'character' : 'movie'}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform"
                         />
                       </div>

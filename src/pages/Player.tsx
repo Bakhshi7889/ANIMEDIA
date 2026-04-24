@@ -7,6 +7,7 @@ import { cn } from "../lib/utils";
 import LiveChat from "../components/LiveChat";
 import { motion, AnimatePresence } from "motion/react";
 import Hls from "hls.js";
+import CachedImage from "../components/CachedImage";
 
 const VideoPlayer: React.FC<{ src: string, className?: string, controls?: boolean, autoPlay?: boolean }> = ({ src, className, controls, autoPlay }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -430,7 +431,7 @@ export default function Player() {
                             <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }} key={`${episode.id}-${idx}`} onClick={() => setActiveEpisode(episode.episode_number)} className={`flex gap-4 p-3 rounded-2xl text-left transition-all group ${activeEpisode === episode.episode_number ? 'bg-white/10 ring-1 ring-white/20' : 'hover:bg-white/5'}`}>
                               <div className="w-32 aspect-video bg-[#222] rounded-xl overflow-hidden shrink-0 relative border border-white/5">
                                 {episode.still_path ? (
-                                  <img src={getImageUrl(episode.still_path, 'w300')} alt={episode.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
+                                  <CachedImage src={getImageUrl(episode.still_path, 'w300')} type="movie" alt={episode.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
                                 ) : (
                                    <div className="w-full h-full flex items-center justify-center text-[10px] text-white/20 uppercase font-black tracking-tighter">No Feed</div>
                                 )}
