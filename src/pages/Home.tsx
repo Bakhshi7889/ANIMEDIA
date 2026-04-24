@@ -107,10 +107,10 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="flex-1 flex flex-col gap-10 lg:px-0">
-         <div className="hidden lg:block h-[65vh] w-full rounded-[2.5rem] bg-white/5 animate-pulse" />
-         <div className="lg:hidden h-[45vh] w-full bg-white/5 animate-pulse" />
-         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 px-6 lg:px-0">
+      <div className="flex-1 flex flex-col gap-10 md:px-0 landscape:px-0">
+         <div className="hidden md:block landscape:block h-[65vh] w-full rounded-[2.5rem] bg-white/5 animate-pulse" />
+         <div className="md:hidden landscape:hidden h-[45vh] w-full bg-white/5 animate-pulse" />
+         <div className="grid grid-cols-2 md:grid-cols-3 landscape:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 px-6 md:px-0 landscape:px-0">
             {Array.from({ length: 12 }).map((_, i) => <div key={i} className="aspect-[2/3] w-full bg-white/5 rounded-2xl animate-pulse" />)}
          </div>
       </div>
@@ -136,7 +136,7 @@ export default function Home() {
   return (
     <div className="flex flex-col gap-12 pb-32">
       {/* Desktop Hero Section */}
-      <section className="hidden lg:block relative w-full h-[65vh] rounded-[2.5rem] overflow-hidden shrink-0 border border-white/5 bg-black group/hero">
+      <section className="hidden md:block landscape:block relative w-full h-[65vh] rounded-[2.5rem] overflow-hidden shrink-0 border border-white/5 bg-black group/hero">
         <AnimatePresence mode="wait">
            {heroMovie && (
              <motion.div 
@@ -225,7 +225,7 @@ export default function Home() {
       </section>
 
       {/* Mobile Hero View */}
-      <section className="lg:hidden flex flex-col gap-8">
+      <section className="md:hidden landscape:hidden flex flex-col gap-8">
         <div 
           ref={carouselRef}
           className="flex overflow-x-auto snap-x snap-mandatory gap-[10vw] no-scrollbar pb-4 pt-4 px-[20vw]"
@@ -262,7 +262,7 @@ export default function Home() {
 
       {/* Continue Watching Row */}
       {recentlyWatched.length > 0 && (
-        <section className="flex flex-col gap-6 px-6 lg:px-0">
+        <section className="flex flex-col gap-6 px-6 md:px-0 landscape:px-0">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-white tracking-tight uppercase px-2 py-1 bg-white/5 rounded-md">Continue Watching</h2>
             <Link to="/timeline" className="text-[10px] uppercase font-black tracking-widest text-white/30 hover:text-white transition-colors">History &rarr;</Link>
@@ -302,10 +302,10 @@ export default function Home() {
       )}
 
       {/* Main Grid */}
-      <section className="flex flex-col gap-8 px-6 lg:px-0">
+      <section className="flex flex-col gap-8 px-6 md:px-0 landscape:px-0">
         <div className="flex items-center justify-between">
            <h2 className="text-xl font-bold text-white tracking-tight uppercase px-2 py-1 bg-white/5 rounded-md">Premierest Items</h2>
-           <div className="flex gap-2">
+           <div className="flex gap-2 text-xs">
               {["All", "Movie", "Series", "Anime"].map(l => (
                 <span 
                   key={l} 
@@ -317,7 +317,7 @@ export default function Home() {
            </div>
         </div>
         <motion.div 
-          className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-x-6 gap-y-12"
+          className="grid grid-cols-2 md:grid-cols-3 landscape:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-x-6 gap-y-12"
           initial="hidden"
           animate="visible"
           variants={{

@@ -49,8 +49,8 @@ export default function Actor() {
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
       </button>
 
-      <div className="flex flex-col md:flex-row gap-8">
-        <div className="w-full md:w-1/3 max-w-sm shrink-0">
+      <div className="flex flex-col md:flex-row landscape:flex-row gap-8">
+        <div className="w-full md:w-1/3 landscape:w-1/3 max-w-sm shrink-0">
           <CachedImage 
             src={getImageUrl(person.profile_path, 'w500')} 
             alt={person.name}
@@ -69,7 +69,7 @@ export default function Actor() {
 
       <div className="flex flex-col gap-6 mt-8">
         <h2 className="text-2xl font-bold text-white">Known For</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-4 gap-y-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 landscape:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-4 gap-y-8">
           {credits.map((m: any) => (
             <MovieCard key={`${m.id}-${m.media_type}`} movie={m} />
           ))}

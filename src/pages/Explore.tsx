@@ -102,7 +102,7 @@ export default function Explore() {
                    allow="autoplay; encrypted-media"
                    className={cn(
                      "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-opacity duration-1000",
-                     "w-[350vw] h-[350vw] sm:w-[150vw] sm:h-[150vw] md:w-[100vw] md:h-[100vw]",
+                     "w-[350vw] h-[350vw] sm:w-[150vw] sm:h-[150vw] md:w-[100vw] md:h-[100vw] landscape:w-[100vw] landscape:h-[100vw]",
                      isActive ? "opacity-100 scale-100" : "opacity-0 scale-105"
                    )}
                  />
@@ -121,7 +121,7 @@ export default function Explore() {
 
             {/* UI Overlay */}
             {isActive && (
-              <div className="absolute inset-x-0 bottom-0 top-0 pointer-events-none flex flex-col justify-end p-6 pb-24 lg:pb-12 gap-4 z-10">
+              <div className="absolute inset-x-0 bottom-0 top-0 pointer-events-none flex flex-col justify-end p-6 pb-24 md:pb-12 landscape:pb-12 gap-4 z-10">
                 <div className="flex items-end justify-between w-full max-w-lg mx-auto pointer-events-auto">
                    
                    {/* Left side content */}

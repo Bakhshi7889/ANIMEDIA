@@ -37,10 +37,10 @@ export default function Layout() {
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
 
   return (
-    <div className="min-h-screen flex bg-[#0e1518] lg:bg-[#0e1518] max-lg:bg-[#050505] text-[#f9f8ff] font-sans selection:bg-yellow-500/30">
+    <div className="min-h-screen flex bg-[#0e1518] md:bg-[#0e1518] landscape:bg-[#0e1518] max-md:landscape:bg-[#0e1518] max-md:bg-[#050505] text-[#f9f8ff] font-sans selection:bg-yellow-500/30">
       
-      {/* Desktop Sidebar (lg screens and up) */}
-      <aside className="hidden lg:flex flex-col w-64 h-screen fixed left-0 top-0 border-r border-white/5 bg-[#0e1518] z-50">
+      {/* Desktop Sidebar (md screens or landscape orientation) */}
+      <aside className="hidden md:flex landscape:flex flex-col w-64 h-screen fixed left-0 top-0 border-r border-white/5 bg-[#0e1518] z-50">
         <div className="p-8 flex items-center gap-3">
           <div className="w-8 h-8 bg-yellow-400 rounded-md flex items-center justify-center text-black shadow-[0_0_15px_rgba(250,204,21,0.3)]">
             <Film className="w-5 h-5 fill-current" />
@@ -89,10 +89,10 @@ export default function Layout() {
       </aside>
 
       {/* Main Content Wrap */}
-      <div className="flex-1 lg:pl-64 flex flex-col min-h-screen relative w-full">
+      <div className="flex-1 md:pl-64 landscape:pl-64 flex flex-col min-h-screen relative w-full">
         
         {/* Desktop Header */}
-        <header className="hidden lg:flex sticky top-0 z-40 bg-[#0e1518]/90 backdrop-blur-xl px-6 py-4 flex-row gap-4 items-center justify-between">
+        <header className="hidden md:flex landscape:flex sticky top-0 z-40 bg-[#0e1518]/90 backdrop-blur-xl px-6 py-4 flex-row gap-4 items-center justify-between">
           <div className="flex items-center w-full sm:w-auto gap-4 flex-1 justify-end max-w-4xl lg:ml-auto">
             {/* Category Dropdown & Search Combo */}
         <form 
@@ -169,9 +169,9 @@ export default function Layout() {
           </div>
         </header>
 
-        {/* Mobile Header (All orientations under lg threshold) */}
+        {/* Mobile Header (Under md threshold and not in landscape) */}
         {!isDetailsOrPlay && (
-          <header className="lg:hidden pt-12 pt-safe pb-2 px-6 flex items-center justify-between z-40 bg-gradient-to-b from-[#050505] to-transparent sticky top-0 w-full pointer-events-none">
+          <header className="md:hidden landscape:hidden pt-12 pt-safe pb-2 px-6 flex items-center justify-between z-40 bg-gradient-to-b from-[#050505] to-transparent sticky top-0 w-full pointer-events-none">
              <div className="flex items-center gap-3 pointer-events-auto">
                 <div className="flex items-baseline gap-2">
                    <span className="font-bold text-xl tracking-tight text-white drop-shadow-md">Animedia</span>
@@ -198,14 +198,14 @@ export default function Layout() {
           </header>
         )}
 
-        <main className={cn("flex-1 w-full max-w-full overflow-x-hidden", !isDetailsOrPlay ? "pb-24 lg:pb-12 lg:p-6" : "")}>
+        <main className={cn("flex-1 w-full max-w-full overflow-x-hidden", !isDetailsOrPlay ? "pb-24 md:pb-12 landscape:pb-12 md:p-6 landscape:p-6" : "")}>
           <Outlet />
         </main>
       </div>
-
+ 
       {/* Mobile Bottom Navigation (Purrweb Style) */}
       {!isDetailsOrPlay && (
-        <nav className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[85%] max-w-[400px] bg-[#1a2226]/80 backdrop-blur-3xl p-1.5 rounded-[2rem] flex items-center justify-around shadow-[0_20px_40px_rgba(0,0,0,0.8)] pb-1.5 pt-1.5 border border-white/10">
+        <nav className="md:hidden landscape:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[85%] max-w-[400px] bg-[#1a2226]/80 backdrop-blur-3xl p-1.5 rounded-[2rem] flex items-center justify-around shadow-[0_20px_40px_rgba(0,0,0,0.8)] pb-1.5 pt-1.5 border border-white/10">
           {mobileNavLinks.map(item => (
             <Link 
               key={item.label}
