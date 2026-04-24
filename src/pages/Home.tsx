@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { getTrending, getDetails, type TMDBMovie } from "../services/tmdb";
+import { getTrending, getDetails, type TMDBMovie, getImageUrl } from "../services/tmdb";
 import MovieCard from "../components/MovieCard";
 import { getRecentlyWatched, type WatchProgress } from "../lib/storage";
 import { Link } from "react-router-dom";
 import { cn } from "../lib/utils";
 import { motion, AnimatePresence } from "motion/react";
 import { Skeleton, MovieCardSkeleton } from "../components/Skeleton";
+import CachedImage from "../components/CachedImage";
 
 export default function Home() {
   const [movies, setMovies] = useState<TMDBMovie[]>([]);
@@ -153,9 +154,10 @@ export default function Home() {
                     title="Hero Trailer"
                   />
                 ) : (
-                  <img 
-                    src={`https://image.tmdb.org/t/p/original${heroMovie.backdrop_path}`}
+                  <CachedImage 
+                    src={getImageUrl(heroMovie.backdrop_path, 'w1280')}
                     alt="Hero"
+                    type="movie"
                     className="w-full h-full object-cover opacity-60"
                   />
                 )}
@@ -241,7 +243,12 @@ export default function Home() {
                  )}
                >
                   <div className={cn("w-full aspect-[2/3] rounded-[2.5rem] overflow-hidden border border-white/5 relative shadow-2xl bg-[#1a2226]")}>
-                    <img alt={m.title || m.name} src={`https://image.tmdb.org/t/p/w500${m.poster_path}`} className="w-full h-full object-cover" />
+                    <CachedImage 
+                      alt={m.title || m.name} 
+                      src={getImageUrl(m.poster_path, 'w500')} 
+                      type="movie"
+                      className="w-full h-full object-cover" 
+                    />
                   </div>
                   <div className={cn("flex flex-col items-center gap-2 text-center w-full", isActive ? "opacity-100" : "opacity-0")}>
                     <h2 className="text-2xl font-bold text-white tracking-tight leading-none uppercase">{m.title || m.name}</h2>
@@ -269,7 +276,12 @@ export default function Home() {
                 transition={{ delay: idx * 0.1 }}
               >
                 <Link to={`/play/${item.mediaType}/${item.id}?resume=${Math.floor(item.currentTime)}`} className="relative w-72 h-40 shrink-0 rounded-[2rem] overflow-hidden group border border-white/5 bg-[#111] block">
-                  <img alt={item.movieDetails.title || item.movieDetails.name} src={`https://image.tmdb.org/t/p/w400${item.movieDetails.backdrop_path || item.movieDetails.poster_path}`} className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700" />
+                  <CachedImage 
+                    alt={item.movieDetails.title || item.movieDetails.name} 
+                    src={getImageUrl(item.movieDetails.backdrop_path || item.movieDetails.poster_path, 'w300')} 
+                    type="movie"
+                    className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700" 
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
                   
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 backdrop-blur-xl flex items-center justify-center border border-white/20 text-white opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100 shadow-2xl">

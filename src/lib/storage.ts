@@ -15,6 +15,13 @@ export interface WatchProgress {
   movieDetails: TMDBMovie; // Stored to display easily in list
 }
 
+interface CachedImage {
+  url: string;
+  blob: Blob;
+  type: 'character' | 'movie';
+  lastUsed: number;
+}
+
 interface AnimediaDB extends DBSchema {
   favorites: {
     key: string;
@@ -25,23 +32,88 @@ interface AnimediaDB extends DBSchema {
     value: WatchProgress;
     indexes: { 'by-timestamp': number };
   };
+  imageCache: {
+    key: string;
+    value: CachedImage;
+    indexes: { 'by-lastUsed': number };
+  };
 }
 
 const DB_NAME = 'animedia-db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 export async function initDB() {
   return openDB<AnimediaDB>(DB_NAME, DB_VERSION, {
-    upgrade(db) {
-      if (!db.objectStoreNames.contains('favorites')) {
-        db.createObjectStore('favorites', { keyPath: 'id' });
+    upgrade(db, oldVersion) {
+      if (oldVersion < 1) {
+        if (!db.objectStoreNames.contains('favorites')) {
+          db.createObjectStore('favorites', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('progress')) {
+          const progressStore = db.createObjectStore('progress', { keyPath: 'id' });
+          progressStore.createIndex('by-timestamp', 'timestamp');
+        }
       }
-      if (!db.objectStoreNames.contains('progress')) {
-        const progressStore = db.createObjectStore('progress', { keyPath: 'id' });
-        progressStore.createIndex('by-timestamp', 'timestamp');
+      if (oldVersion < 2) {
+        if (!db.objectStoreNames.contains('imageCache')) {
+          const imageStore = db.createObjectStore('imageCache', { keyPath: 'url' });
+          imageStore.createIndex('by-lastUsed', 'lastUsed');
+        }
       }
     },
   });
+}
+
+// --- Image Caching ---
+export async function getCachedImage(url: string, type: 'character' | 'movie'): Promise<string> {
+  const localDb = await initDB();
+  const cached = await localDb.get('imageCache', url);
+  
+  if (cached) {
+    // Update lastUsed
+    await localDb.put('imageCache', { ...cached, lastUsed: Date.now() });
+    return URL.createObjectURL(cached.blob);
+  }
+
+  // Fetch and cache
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    await localDb.put('imageCache', {
+      url,
+      blob,
+      type,
+      lastUsed: Date.now()
+    });
+    return URL.createObjectURL(blob);
+  } catch (error) {
+    return url; // Fallback to network URL
+  }
+}
+
+export async function cleanupImages() {
+  const localDb = await initDB();
+  const tx = localDb.transaction('imageCache', 'readwrite');
+  const index = tx.store.index('by-lastUsed');
+  
+  const now = Date.now();
+  const ONE_DAY = 24 * 60 * 60 * 1000;
+  const SEVEN_DAYS = 7 * ONE_DAY;
+
+  let cursor = await index.openCursor();
+  while (cursor) {
+    const item = cursor.value;
+    const age = now - item.lastUsed;
+    
+    const shouldDelete = 
+      (item.type === 'character' && age > ONE_DAY) ||
+      (item.type === 'movie' && age > SEVEN_DAYS);
+
+    if (shouldDelete) {
+      await cursor.delete();
+    }
+    cursor = await cursor.continue();
+  }
 }
 
 // --- Favorites ---

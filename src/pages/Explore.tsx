@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
-import { getTrending, type TMDBMovie, getDetails } from "../services/tmdb";
+import { getTrending, type TMDBMovie, getDetails, getImageUrl } from "../services/tmdb";
 import { Link } from "react-router-dom";
 import { Play, Heart, MessageCircle, Share2, Info } from "lucide-react";
 import { cn } from "../lib/utils";
+import CachedImage from "../components/CachedImage";
 
 export default function Explore() {
   const [movies, setMovies] = useState<TMDBMovie[]>([]);
@@ -106,8 +107,9 @@ export default function Explore() {
                    )}
                  />
                ) : (
-                 <img 
-                   src={`https://image.tmdb.org/t/p/original${m.poster_path}`} 
+                 <CachedImage 
+                   src={getImageUrl(m.poster_path, 'w780')} 
+                   type="movie"
                    className={cn(
                      "w-full h-full object-cover transition-opacity duration-1000",
                      isActive ? "opacity-90 blur-sm scale-110" : "opacity-0"

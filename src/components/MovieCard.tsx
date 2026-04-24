@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { type TMDBMovie, getImageUrl } from "../services/tmdb";
 import { Play } from "lucide-react";
 import { motion } from "motion/react";
+import CachedImage from "./CachedImage";
 
 interface MovieCardProps {
   movie: TMDBMovie;
@@ -25,9 +26,10 @@ const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
         className="relative aspect-[2/3] overflow-hidden rounded-[2rem] bg-[#1a2226] shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/5 group-focus-visible:ring-4 group-focus-visible:ring-white/50"
       >
-        <img 
+        <CachedImage 
           src={getImageUrl(displayImage)} 
           alt={movie.title || movie.name}
+          type={isPerson ? 'character' : 'movie'}
           className="w-full h-full object-cover transition-transform duration-700 ease-out"
           loading="lazy"
         />

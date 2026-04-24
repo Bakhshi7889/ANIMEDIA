@@ -1,17 +1,26 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import Layout from "./components/Layout";
-import Home from "./pages/Home";
-import Search from "./pages/Search";
-import Details from "./pages/Details";
-import Player from "./pages/Player";
-import Library from "./pages/Library";
-import Settings from "./pages/Settings";
-import Timeline from "./pages/Timeline";
-import Actor from "./pages/Actor";
-import Explore from "./pages/Explore";
 import { useAuth } from "./lib/firebase";
-import { syncUserData } from "./lib/storage";
+import { syncUserData, cleanupImages } from "./lib/storage";
+import InstallPrompt from "./components/InstallPrompt";
+
+// Lazy load pages for better performance
+const Home = lazy(() => import("./pages/Home"));
+const Search = lazy(() => import("./pages/Search"));
+const Details = lazy(() => import("./pages/Details"));
+const Player = lazy(() => import("./pages/Player"));
+const Library = lazy(() => import("./pages/Library"));
+const Settings = lazy(() => import("./pages/Settings"));
+const Timeline = lazy(() => import("./pages/Timeline"));
+const Actor = lazy(() => import("./pages/Actor"));
+const Explore = lazy(() => import("./pages/Explore"));
+
+const PageLoader = () => (
+  <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+    <div className="w-12 h-12 rounded-full border-2 border-white/10 border-t-[var(--color-accent)] animate-spin" />
+  </div>
+);
 
 export default function App() {
   const { user } = useAuth();
@@ -21,6 +30,10 @@ export default function App() {
       syncUserData();
     }
   }, [user]);
+
+  useEffect(() => {
+    cleanupImages().catch(console.error);
+  }, []);
 
   useEffect(() => {
     const applySettings = () => {
@@ -38,20 +51,23 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="search" element={<Search />} />
-          <Route path="timeline" element={<Timeline />} />
-          <Route path="library" element={<Library />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="details/:type/:id" element={<Details />} />
-          <Route path="actor/:id" element={<Actor />} />
-        </Route>
-        <Route path="/explore" element={<Explore />} />
-        {/* Player handles its own full-screen layout */}
-        <Route path="/play/:type/:id" element={<Player />} />
-      </Routes>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="search" element={<Search />} />
+            <Route path="timeline" element={<Timeline />} />
+            <Route path="library" element={<Library />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="details/:type/:id" element={<Details />} />
+            <Route path="actor/:id" element={<Actor />} />
+          </Route>
+          <Route path="/explore" element={<Explore />} />
+          {/* Player handles its own full-screen layout */}
+          <Route path="/play/:type/:id" element={<Player />} />
+        </Routes>
+        <InstallPrompt />
+      </Suspense>
     </BrowserRouter>
   );
 }

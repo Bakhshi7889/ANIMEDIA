@@ -5,6 +5,7 @@ import { Play, ArrowLeft, Heart, Ticket, Clock, Star, Info } from "lucide-react"
 import { isFavorite, toggleFavorite, getProgress, WatchProgress } from "../lib/storage";
 import { FastAverageColor } from 'fast-average-color';
 import { getOmdbDetails, type OMDbDetails } from "../services/omdb";
+import CachedImage from "../components/CachedImage";
 
 export default function Details() {
   const { type, id } = useParams();
@@ -116,7 +117,7 @@ export default function Details() {
   if (!data) return <div className="p-8 text-center">Not found</div>;
 
   const bgUrl = data.backdrop_path 
-    ? `https://image.tmdb.org/t/p/original${data.backdrop_path}`
+    ? getImageUrl(data.backdrop_path, 'w1280')
     : '';
 
   return (
@@ -148,9 +149,10 @@ export default function Details() {
         <div className="absolute inset-0 bg-gradient-to-t from-[#0e1518] via-transparent to-transparent z-10" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#0e1518] via-[#0e1518]/80 to-transparent z-10" />
         {bgUrl && (
-          <img 
+          <CachedImage 
             src={bgUrl} 
             alt="backdrop" 
+            type="movie"
             className="w-full h-full object-cover opacity-30"
           />
         )}
@@ -159,9 +161,10 @@ export default function Details() {
       {/* Mobile Top Image (Purrweb style) */}
       <div className="landscape:hidden md:hidden relative w-full h-[45vh] shrink-0 border-b border-white/5">
          {bgUrl ? (
-            <img 
+            <CachedImage 
               src={bgUrl} 
               alt="backdrop" 
+              type="movie"
               className="w-full h-full object-cover"
             />
          ) : (
@@ -341,9 +344,10 @@ export default function Details() {
               {data.credits.cast.slice(0, 10).map((actor: any, idx: number) => (
                 <Link to={`/actor/${actor.id}`} key={`${actor.id}-${idx}`} className="relative flex flex-col shrink-0 w-[110px] h-[140px] landscape:w-[130px] landscape:h-[160px] md:w-[130px] md:h-[160px] rounded-[1.2rem] group cursor-pointer transition-transform hover:-translate-y-1 overflow-hidden shadow-lg border border-white/5 bg-[#1a2226]">
                   {actor.profile_path ? (
-                    <img 
-                      src={`https://image.tmdb.org/t/p/w200${actor.profile_path}`} 
+                    <CachedImage 
+                      src={getImageUrl(actor.profile_path, 'w185')} 
                       alt={actor.name}
+                      type="character"
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       loading="lazy"
                     />

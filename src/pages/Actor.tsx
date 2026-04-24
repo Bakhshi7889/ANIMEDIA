@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getPersonDetails, getImageUrl } from "../services/tmdb";
 import MovieCard from "../components/MovieCard";
+import CachedImage from "../components/CachedImage";
 
 export default function Actor() {
   const { id } = useParams<{ id: string }>();
@@ -50,9 +51,10 @@ export default function Actor() {
 
       <div className="flex flex-col md:flex-row gap-8">
         <div className="w-full md:w-1/3 max-w-sm shrink-0">
-          <img 
-            src={getImageUrl(person.profile_path, 'original')} 
+          <CachedImage 
+            src={getImageUrl(person.profile_path, 'w500')} 
             alt={person.name}
+            type="character"
             className="w-full rounded-[2rem] shadow-2xl object-cover aspect-[2/3] border border-white/5"
           />
         </div>
