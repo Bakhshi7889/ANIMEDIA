@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect, lazy, Suspense } from "react";
 import Layout from "./components/Layout";
 import { useAuth } from "./lib/firebase";
-import { syncUserData, cleanupImages } from "./lib/storage";
+import { syncUserData } from "./lib/storage";
 import InstallPrompt from "./components/InstallPrompt";
 
 // Lazy load pages for better performance
@@ -30,10 +30,6 @@ export default function App() {
       syncUserData();
     }
   }, [user]);
-
-  useEffect(() => {
-    cleanupImages().catch(console.error);
-  }, []);
 
   useEffect(() => {
     const applySettings = () => {

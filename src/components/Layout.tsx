@@ -203,23 +203,32 @@ export default function Layout() {
         </main>
       </div>
  
-      {/* Mobile Bottom Navigation (Purrweb Style) */}
+      {/* Mobile Bottom Navigation */}
       {!isDetailsOrPlay && (
-        <nav className="md:hidden landscape:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[85%] max-w-[400px] bg-[#1a2226]/80 backdrop-blur-3xl p-1.5 rounded-[2rem] flex items-center justify-around shadow-[0_20px_40px_rgba(0,0,0,0.8)] pb-1.5 pt-1.5 border border-white/10">
+        <nav 
+          className="md:hidden landscape:hidden fixed bottom-0 left-0 right-0 z-[100] pointer-events-auto bg-[#0a0f12]/95 backdrop-blur-2xl border-t border-white/5 pt-2 px-4 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]"
+          style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 0.5rem)' }}
+        >
+          <div className="flex items-center justify-around w-full max-w-sm mx-auto">
           {mobileNavLinks.map(item => (
             <Link 
               key={item.label}
               to={item.path} 
               className={cn(
-                item.center ? "-mt-8 bg-[var(--color-accent)] text-black p-4 shadow-[0_10px_30px_rgba(250,204,21,0.4)] hover:scale-105 active:scale-95" : "p-3 bg-transparent",
-                "rounded-full transition-all duration-300",
-                location.pathname === item.path && !item.center ? "text-white" : !item.center ? "text-[#959ca3] hover:text-white" : ""
+                "flex flex-col items-center justify-center w-14 h-12 transition-all rounded-xl relative",
+                location.pathname === item.path 
+                  ? "text-[var(--color-accent)] font-bold scale-110" 
+                  : "text-[#959ca3] hover:text-white"
               )}
               title={item.label}
             >
-              <item.icon className="w-6 h-6" strokeWidth={location.pathname === item.path ? 2.5 : 2} fill={location.pathname === item.path && item.icon !== Search && item.icon !== User ? "currentColor" : "none"} />
+              {location.pathname === item.path && (
+                <motion.div layoutId="nav-pill" className="absolute inset-0 bg-white/10 rounded-xl" transition={{ type: 'spring', stiffness: 300, damping: 25 }} />
+              )}
+              <item.icon className="w-6 h-6 relative z-10" strokeWidth={location.pathname === item.path ? 2.5 : 2} fill={location.pathname === item.path && item.icon !== Search && item.icon !== User ? "currentColor" : "none"} />
             </Link>
           ))}
+          </div>
         </nav>
       )}
     </div>

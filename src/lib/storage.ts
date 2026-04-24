@@ -64,57 +64,7 @@ export async function initDB() {
 }
 
 // --- Image Caching ---
-export async function updateImageMetadata(url: string, type: 'character' | 'movie'): Promise<void> {
-  try {
-    const localDb = await initDB();
-    await localDb.put('imageCache', {
-      url,
-      type,
-      lastUsed: Date.now()
-    });
-  } catch (err) {
-    console.error('Failed to update image metadata', err);
-  }
-}
-
-export async function cleanupImages() {
-  try {
-    const localDb = await initDB();
-    const tx = localDb.transaction('imageCache', 'readwrite');
-    const index = tx.store.index('by-lastUsed');
-    
-    const now = Date.now();
-    const ONE_DAY = 24 * 60 * 60 * 1000;
-    const SEVEN_DAYS = 7 * ONE_DAY;
-
-    let cursor = await index.openCursor();
-    const urlsToDelete: string[] = [];
-
-    while (cursor) {
-      const item = cursor.value;
-      const age = now - item.lastUsed;
-      
-      const shouldDelete = 
-        (item.type === 'character' && age > ONE_DAY) ||
-        (item.type === 'movie' && age > SEVEN_DAYS);
-
-      if (shouldDelete) {
-        urlsToDelete.push(item.url);
-        await cursor.delete();
-      }
-      cursor = await cursor.continue();
-    }
-    
-    if (urlsToDelete.length > 0 && 'caches' in window) {
-      const cache = await caches.open('tmdb-images');
-      for (const url of urlsToDelete) {
-        await cache.delete(url);
-      }
-    }
-  } catch (err) {
-    console.error('Failed to cleanup images', err);
-  }
-}
+// Switched to rely on Service Worker for image caching to improve UI responsiveness.
 
 // --- Favorites ---
 export async function toggleFavorite(movie: TMDBMovie): Promise<boolean> {

@@ -34,21 +34,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache TMDB images using a cache-first strategy
-  if (url.hostname === 'image.tmdb.org') {
-    event.respondWith(
-      caches.open('tmdb-images').then((cache) => {
-        return cache.match(request).then((response) => {
-          if (response) return response;
-          return fetch(request, { mode: 'no-cors' }).then((networkResponse) => {
-            cache.put(request, networkResponse.clone());
-            return networkResponse;
-          }).catch(() => {
-            return new Response('', { status: 404 });
-          });
-        });
-      })
-    );
+  // Only cache same-origin GET requests (HTML, JS, CSS, assets)
+  if (url.origin !== location.origin) {
     return;
   }
 
