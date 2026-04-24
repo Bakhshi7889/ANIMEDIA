@@ -209,9 +209,9 @@ export default function Search() {
               >
                 <div className="p-4 flex flex-col gap-1">
                   <div className="px-4 py-2 text-[10px] uppercase font-black tracking-widest text-white/20 border-b border-white/5 mb-2">Live Suggestions</div>
-                  {suggestions.map((item) => (
+                  {suggestions.map((item, idx) => (
                     <Link
-                      key={item.id}
+                      key={`${item.id}-${idx}`}
                       to={item.media_type === 'person' ? `/actor/${item.id}` : `/details/${item.media_type}/${item.id}`}
                       onClick={() => setShowSuggestions(false)}
                       className="group flex items-center gap-4 p-3 rounded-2xl hover:bg-white/5 transition-all active:scale-95"

@@ -338,8 +338,8 @@ export default function Details() {
                 <span className="text-sm font-semibold text-[#959ca3] hover:text-white cursor-pointer mr-6 sm:mr-12">See all</span>
             </div>
             <div className="flex items-start gap-4 overflow-x-auto pb-4 no-scrollbar pointer-events-auto pr-8 px-4 landscape:px-0 md:px-0">
-              {data.credits.cast.slice(0, 10).map((actor: any) => (
-                <Link to={`/actor/${actor.id}`} key={actor.id} className="relative flex flex-col shrink-0 w-[110px] h-[140px] landscape:w-[130px] landscape:h-[160px] md:w-[130px] md:h-[160px] rounded-[1.2rem] group cursor-pointer transition-transform hover:-translate-y-1 overflow-hidden shadow-lg border border-white/5 bg-[#1a2226]">
+              {data.credits.cast.slice(0, 10).map((actor: any, idx: number) => (
+                <Link to={`/actor/${actor.id}`} key={`${actor.id}-${idx}`} className="relative flex flex-col shrink-0 w-[110px] h-[140px] landscape:w-[130px] landscape:h-[160px] md:w-[130px] md:h-[160px] rounded-[1.2rem] group cursor-pointer transition-transform hover:-translate-y-1 overflow-hidden shadow-lg border border-white/5 bg-[#1a2226]">
                   {actor.profile_path ? (
                     <img 
                       src={`https://image.tmdb.org/t/p/w200${actor.profile_path}`} 

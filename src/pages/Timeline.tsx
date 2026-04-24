@@ -65,9 +65,9 @@ export default function Timeline() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {history.map((item) => (
+          {history.map((item, idx) => (
             <Link 
-              key={item.id} 
+              key={`${item.id}-${idx}`} 
               to={`/play/${item.mediaType}/${item.id}?resume=${Math.floor(item.currentTime)}&season=${item.season || 1}&episode=${item.episode || 1}`}
               className="group relative flex flex-col gap-3 p-4 bg-[#1a2226]/50 border border-white/5 rounded-3xl hover:bg-[#1a2226] transition-all hover:scale-[1.02]"
             >

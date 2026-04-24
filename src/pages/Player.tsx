@@ -408,9 +408,9 @@ export default function Player() {
                   {type === 'tv' ? (
                     <>
                       <div className="flex items-center gap-3 overflow-x-auto pb-4 pt-2 no-scrollbar border-b border-white/5 px-2 -mx-2 relative z-20">
-                        {validSeasons.map(season => (
+                        {validSeasons.map((season, sIdx) => (
                         <button
-                          key={season.season_number}
+                          key={`${season.season_number}-${sIdx}`}
                           onClick={() => { setActiveSeason(season.season_number); setActiveEpisode(1); }}
                           className={cn(
                             "shrink-0 px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",
@@ -427,7 +427,7 @@ export default function Player() {
                       <div className="flex flex-col gap-3 rounded-xl mt-4">
                         {episodes.length > 0 ? (
                           episodes.map((episode, idx) => (
-                            <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }} key={episode.id} onClick={() => setActiveEpisode(episode.episode_number)} className={`flex gap-4 p-3 rounded-2xl text-left transition-all group ${activeEpisode === episode.episode_number ? 'bg-white/10 ring-1 ring-white/20' : 'hover:bg-white/5'}`}>
+                            <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }} key={`${episode.id}-${idx}`} onClick={() => setActiveEpisode(episode.episode_number)} className={`flex gap-4 p-3 rounded-2xl text-left transition-all group ${activeEpisode === episode.episode_number ? 'bg-white/10 ring-1 ring-white/20' : 'hover:bg-white/5'}`}>
                               <div className="w-32 aspect-video bg-[#222] rounded-xl overflow-hidden shrink-0 relative border border-white/5">
                                 {episode.still_path ? (
                                   <img src={`https://image.tmdb.org/t/p/w300${episode.still_path}`} alt={episode.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />

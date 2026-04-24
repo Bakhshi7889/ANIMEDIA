@@ -91,7 +91,7 @@ export default function Explore() {
         const trailerKey = trailers[idx];
 
         return (
-          <div key={m.id} className="w-full h-screen snap-center relative flex items-center justify-center bg-black overflow-hidden">
+          <div key={`${m.id}-${idx}`} className="w-full h-screen snap-center relative flex items-center justify-center bg-black overflow-hidden">
             
             {/* Background elements */}
             <div className="absolute inset-0 z-0">

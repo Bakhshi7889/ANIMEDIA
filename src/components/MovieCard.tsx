@@ -6,7 +6,6 @@ import { motion } from "motion/react";
 
 interface MovieCardProps {
   movie: TMDBMovie;
-  key?: any;
 }
 
 const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
