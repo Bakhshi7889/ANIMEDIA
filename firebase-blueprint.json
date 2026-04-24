@@ -1,0 +1,79 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile document",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "User UID" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "uiStyle": { "type": "string" }
+      },
+      "required": ["id"]
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "Video comment",
+      "type": "object",
+      "properties": {
+        "mediaId": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userPhoto": { "type": "string" },
+        "text": { "type": "string" },
+        "videoTimeMs": { "type": "number" },
+        "createdAt": { "type": "object", "description": "Server timestamp" }
+      },
+      "required": ["mediaId", "userId", "text"]
+    },
+    "WatchProgress": {
+      "title": "WatchProgress",
+      "description": "User watch progress for a movie or show",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "mediaType": { "type": "string" },
+        "progress": { "type": "number" },
+        "currentTime": { "type": "number" },
+        "duration": { "type": "number" },
+        "season": { "type": "number" },
+        "episode": { "type": "number" },
+        "timestamp": { "type": "number" },
+        "movieDetails": { "type": "object" }
+      },
+      "required": ["id", "userId", "mediaType", "progress"]
+    },
+    "Favorite": {
+      "title": "Favorite",
+      "description": "User's favorite media",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "timestamp": { "type": "number" },
+        "movieDetails": { "type": "object" }
+      },
+      "required": ["id", "userId", "movieDetails"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Stores user profiles."
+    },
+    "/comments/{commentId}": {
+      "schema": "Comment",
+      "description": "Video comments."
+    },
+    "/users/{userId}/progress/{progressId}": {
+      "schema": "WatchProgress",
+      "description": "Cross-device synced watch progress."
+    },
+    "/users/{userId}/favorites/{favoriteId}": {
+      "schema": "Favorite",
+      "description": "Cross-device synced favorites."
+    }
+  }
+}

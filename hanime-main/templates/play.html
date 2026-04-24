@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block metatitle %}Hanime Api{% endblock metatitle %}
+{% block metadescription %}Enjoy your unlimited hentai & anime collection. We are the definitive source for the best curated 720p / 1080p HD hentai videos, viewable by mobile phone and tablet, for free.{% endblock metadescription %}
+{% block metakeywords %}hentai, hentai api, hentai porn api{% endblock metakeywords %}
+{% block title %}HanimeBeast{% endblock %}
+{% block content %}
+
+<style>
+    .card {
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .card-body {
+        position: relative;
+        padding: 0;
+    }
+
+    video {
+        width: 100%;
+        height: auto;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-body">
+            <video id="live" autoplay controls>
+                <source src="{{ link }}" type="video/mp4">
+            </video>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
