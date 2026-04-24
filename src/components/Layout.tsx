@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Search, Home, Heart, CalendarClock, TrendingUp, Settings, HelpCircle, Film, Bell, Play, User, LogIn, Flame } from "lucide-react";
 import { useAuth, signInWithGoogle } from "../lib/firebase";
 import { cn } from "../lib/utils";
+import { motion } from "motion/react";
 
 export default function Layout() {
   const location = useLocation();

@@ -69,43 +69,41 @@ export default function Search() {
     const delayDebounceFn = setTimeout(async () => {
       setSelectedCategory(null);
       
-      // Fetch suggestions
+      setLoading(true);
       try {
         const data = await searchMedia(query);
         setSuggestions(data.slice(0, 6)); // Top 6 for autocomplete
         setShowSuggestions(true);
         
-        // Also perform full search if pressing enter or after delay
-        performSearch(query);
+        if (data.length === 0) setHasMore(false);
+        else setHasMore(true);
+        
+        setResults(data.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i));
         navigate(`/search?q=${encodeURIComponent(query)}`, { replace: true });
       } catch (err) {
         console.error(err);
+      } finally {
+        setLoading(false);
       }
     }, 400);
 
     return () => clearTimeout(delayDebounceFn);
   }, [query, navigate, selectedCategory]);
 
-  const performSearch = async (q: string, p = 1) => {
-    if (p === 1) setLoading(true);
-    else setIsLoadingMore(true);
+  const loadMoreSearch = async (q: string, p: number) => {
+    setIsLoadingMore(true);
     
     try {
       const data = await searchMedia(q, p);
       if (data.length === 0) setHasMore(false);
       
-      if (p === 1) {
-        setResults(data.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i));
-      } else {
-        setResults(prev => {
-          const combined = [...prev, ...data];
-          return combined.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
-        });
-      }
+      setResults(prev => {
+        const combined = [...prev, ...data];
+        return combined.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
+      });
     } catch (err) {
       console.error(err);
     } finally {
-      setLoading(false);
       setIsLoadingMore(false);
     }
   };
@@ -154,7 +152,7 @@ export default function Search() {
       if (selectedCategory) {
         handleCategoryClick(selectedCategory, page);
       } else if (query) {
-        performSearch(query, page);
+        loadMoreSearch(query, page);
       }
     }
   }, [page]);
@@ -248,7 +246,7 @@ export default function Search() {
                   ))}
                   <div className="p-2 pt-4 flex justify-center">
                     <button 
-                      onClick={() => { setShowSuggestions(false); performSearch(query); }}
+                      onClick={() => { setShowSuggestions(false); navigate(`/search?q=${encodeURIComponent(query)}`); }}
                       className="text-[10px] uppercase font-black tracking-widest text-[var(--color-accent)] hover:opacity-100 opacity-60 transition-opacity"
                     >
                       View all results &rarr;

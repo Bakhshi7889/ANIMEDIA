@@ -5,8 +5,8 @@ import { useAuth } from "./lib/firebase";
 import { syncUserData } from "./lib/storage";
 import InstallPrompt from "./components/InstallPrompt";
 
+import Home from "./pages/Home";
 // Lazy load pages for better performance
-const Home = lazy(() => import("./pages/Home"));
 const Search = lazy(() => import("./pages/Search"));
 const Details = lazy(() => import("./pages/Details"));
 const Player = lazy(() => import("./pages/Player"));
