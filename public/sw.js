@@ -2,7 +2,9 @@ const CACHE_NAME = 'animedia-v1';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/manifest.json'
+  '/manifest.json',
+  '/Picsart_26-04-25_20-39-47-646.png',
+  '/Picsart_26-04-25_20-41-11-014.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -31,6 +33,25 @@ self.addEventListener('fetch', (event) => {
   }
 
   if (request.method !== 'GET') {
+    return;
+  }
+
+  // Network First with Cache Fallback for navigation requests
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then((networkResponse) => {
+          return caches.open(CACHE_NAME).then((cache) => {
+            cache.put(request, networkResponse.clone());
+            return networkResponse;
+          });
+        })
+        .catch(() => {
+          return caches.match('/index.html').then((cachedResponse) => {
+            return cachedResponse || new Response('Offline', { status: 503 });
+          });
+        })
+    );
     return;
   }
 

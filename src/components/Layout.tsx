@@ -3,7 +3,6 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Search, Home, Heart, CalendarClock, TrendingUp, Settings, HelpCircle, Film, Bell, Play, User, LogIn, Flame } from "lucide-react";
 import { useAuth, signInWithGoogle } from "../lib/firebase";
 import { cn } from "../lib/utils";
-import { motion } from "motion/react";
 
 export default function Layout() {
   const location = useLocation();
@@ -224,7 +223,7 @@ export default function Layout() {
               title={item.label}
             >
               {location.pathname === item.path && (
-                <motion.div layoutId="nav-pill" className="absolute inset-0 bg-white/10 rounded-xl" transition={{ type: 'spring', stiffness: 300, damping: 25 }} />
+                <div className="absolute inset-0 bg-white/10 rounded-xl transition-all" />
               )}
               <item.icon className="w-6 h-6 relative z-10" strokeWidth={location.pathname === item.path ? 2.5 : 2} fill={location.pathname === item.path && item.icon !== Search && item.icon !== User ? "currentColor" : "none"} />
             </Link>
