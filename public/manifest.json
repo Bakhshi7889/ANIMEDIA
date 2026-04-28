@@ -3,7 +3,8 @@
   "short_name": "Animedia",
   "description": "Premium Private Cinematic Experience",
   "start_url": "/",
-  "id": "/?source=pwa",
+  "id": "/?pwa=1",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#050505",
   "theme_color": "#050505",
@@ -19,6 +20,22 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/Picsart_26-04-25_20-41-11-014.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Home Screen Desktop"
+    },
+    {
+      "src": "/Picsart_26-04-25_20-41-11-014.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Home Screen Mobile"
     }
   ]
 }

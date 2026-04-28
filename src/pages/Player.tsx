@@ -48,11 +48,10 @@ const COLORS = [
 ];
 
 const SERVER_PROVIDERS = [
-  { id: 'vidking', name: 'Vidking (High Speed)' },
-  { id: 'vidlink', name: 'VidLink (New)' },
-  { id: 'vidrock', name: 'VidRock (Ultra)' },
-  { id: 'autoembed', name: 'AutoEmbed (Anime/TV)' },
-  { id: 'vidsrc', name: 'VidSrc (Backup)' }
+  { id: 'vidsrc', name: 'VidSrc', dot: 'bg-green-500' },
+  { id: 'vidking', name: 'Vidking', dot: 'bg-green-500' },
+  { id: 'vidrock', name: 'VidRock', dot: 'bg-green-500' },
+  { id: 'vidlink', name: 'VidLink', dot: 'bg-yellow-500' }
 ];
 
 const VOICE_PROVIDERS = [
@@ -196,12 +195,6 @@ export default function Player() {
       return type === 'movie'
         ? `https://vidlink.pro/movie/${id}?primaryColor=${cleanAccent}&autoplay=false&startAt=${currentProgress}`
         : `https://vidlink.pro/tv/${id}/${activeSeason}/${activeEpisode}?primaryColor=${cleanAccent}&autoplay=false&startAt=${currentProgress}`;
-    }
-
-    if (serverMode === 'autoembed') {
-      return type === 'movie'
-        ? `https://player.autoembed.cc/embed/movie/${id}`
-        : `https://player.autoembed.cc/embed/tv/${id}/${activeSeason}/${activeEpisode}`;
     }
 
     if (serverMode === 'vidsrc') {
@@ -363,10 +356,11 @@ export default function Player() {
                       key={sp.id}
                       onClick={() => { setServerMode(sp.id); localStorage.setItem('animedia_server', sp.id); }}
                       className={cn(
-                        "px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",
+                        "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",
                         serverMode === sp.id ? "bg-[var(--color-accent)] text-black" : "text-white/40 hover:text-white"
                       )}
                     >
+                      <span className={cn("w-1.5 h-1.5 rounded-full shadow-sm", sp.dot)} />
                       {sp.name.split(' ')[0]}
                     </button>
                  ))}
