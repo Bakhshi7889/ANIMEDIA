@@ -4,7 +4,7 @@ import MovieCard from "../components/MovieCard";
 import { getRecentlyWatched, type WatchProgress } from "../lib/storage";
 import { Link } from "react-router-dom";
 import { cn } from "../lib/utils";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Skeleton, MovieCardSkeleton } from "../components/Skeleton";
 import CachedImage from "../components/CachedImage";
 

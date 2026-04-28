@@ -1,7 +1,5 @@
 import { openDB, DBSchema } from 'idb';
 import { TMDBMovie } from '../services/tmdb';
-import { auth, db } from './firebase';
-import { doc, setDoc, getDoc, deleteDoc, collection, getDocs, query, orderBy, limit as fsLimit } from 'firebase/firestore';
 
 export interface WatchProgress {
   id: string; // the string representation of TMDB ID
@@ -71,26 +69,12 @@ export async function toggleFavorite(movie: TMDBMovie): Promise<boolean> {
   const localDb = await initDB();
   const idStr = String(movie.id);
   const exists = await localDb.get('favorites', idStr);
-  const user = auth.currentUser;
   
   if (exists) {
     await localDb.delete('favorites', idStr);
-    if (user) {
-      try { await deleteDoc(doc(db, `users/${user.uid}/favorites/${idStr}`)); } catch(e){}
-    }
     return false;
   } else {
     await localDb.put('favorites', movie);
-    if (user) {
-      try {
-        await setDoc(doc(db, `users/${user.uid}/favorites/${idStr}`), {
-          id: idStr,
-          userId: user.uid,
-          timestamp: Date.now(),
-          movieDetails: movie
-        });
-      } catch(e) {}
-    }
     return true;
   }
 }
@@ -109,16 +93,6 @@ export async function getFavorites(): Promise<TMDBMovie[]> {
 export async function saveProgress(progressData: WatchProgress) {
   const localDb = await initDB();
   await localDb.put('progress', progressData);
-  
-  const user = auth.currentUser;
-  if (user) {
-    try {
-      await setDoc(doc(db, `users/${user.uid}/progress/${progressData.id}`), {
-        ...progressData,
-        userId: user.uid
-      });
-    } catch(e) {}
-  }
 }
 
 export async function getProgress(id: string | number): Promise<WatchProgress | undefined> {
@@ -129,46 +103,10 @@ export async function getProgress(id: string | number): Promise<WatchProgress | 
 export async function clearHistory(): Promise<void> {
   const localDb = await initDB();
   await localDb.clear('progress');
-  const user = auth.currentUser;
-  if (user) {
-      try {
-          const q = collection(db, `users/${user.uid}/progress`);
-          const snaps = await getDocs(q);
-          snaps.forEach(async (d) => {
-              await deleteDoc(d.ref);
-          });
-      } catch(e) {}
-  }
 }
 
 export async function syncUserData() {
-  const user = auth.currentUser;
-  if (!user) return;
-  const localDb = await initDB();
-  
-  try {
-    const favsQuery = collection(db, `users/${user.uid}/favorites`);
-    const favsSnap = await getDocs(favsQuery);
-    const txFav = localDb.transaction('favorites', 'readwrite');
-    for (const doc of favsSnap.docs) {
-      const data = doc.data();
-      if (data.movieDetails) {
-        txFav.store.put(data.movieDetails);
-      }
-    }
-    await txFav.done;
-
-    const progQuery = collection(db, `users/${user.uid}/progress`);
-    const progSnap = await getDocs(progQuery);
-    const txProg = localDb.transaction('progress', 'readwrite');
-    for (const doc of progSnap.docs) {
-      const data = doc.data() as Pick<WatchProgress, keyof WatchProgress>;
-      txProg.store.put(data);
-    }
-    await txProg.done;
-  } catch (error) {
-    console.error("Failed to sync user data from Firebase:", error);
-  }
+  // Local storage only, nothing to sync
 }
 
 export async function getRecentlyWatched(limitCount = 10): Promise<WatchProgress[]> {

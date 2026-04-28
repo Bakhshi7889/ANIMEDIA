@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { Check, ShieldAlert, LogIn, LogOut, Clock, Film } from "lucide-react";
+import { Check, ShieldAlert, Clock, Film } from "lucide-react";
 import { cn } from "../lib/utils";
-import { useAuth, signInWithGoogle, signOut } from "../lib/firebase";
 
 const COLORS = [
   { id: 'ffffff', name: 'Classic White', hex: '#ffffff' },
@@ -27,7 +26,6 @@ const CAPTION_LANGUAGES = [
 ];
 
 export default function Settings() {
-  const { user } = useAuth();
   const [accentColor, setAccentColor] = useState(localStorage.getItem('animedia_color') || 'ffffff');
   const [uiStyle, setUiStyle] = useState(localStorage.getItem('animedia_ui_style') || 'roundy');
   
@@ -45,11 +43,15 @@ export default function Settings() {
   }, [accentColor, uiStyle, captionsEnabled, captionLang]);
 
   useEffect(() => {
-    // Count local history and downloads
-    try {
-      const history = JSON.parse(localStorage.getItem('animedia_progress') || "[]");
-      setLocalHistoryCount(history.length);
-    } catch(e) {}
+    // Count local history and downloads (via our storage mechanism, typically saved to indexedDB not localstorage but we can fetch it)
+    const fetchHistory = async () => {
+       try {
+          const { getRecentlyWatched } = await import('../lib/storage');
+          const history = await getRecentlyWatched(100);
+          setLocalHistoryCount(history.length);
+       } catch(e) {}
+    };
+    fetchHistory();
   }, []);
 
   return (
@@ -58,55 +60,6 @@ export default function Settings() {
         <h1 className="text-4xl font-serif font-light text-white tracking-wide">Settings</h1>
         <p className="text-white/50 mt-2">Customize your premium streaming experience.</p>
       </div>
-
-      {/* Account Section */}
-      <section className="flex flex-col gap-4">
-        <div>
-          <h2 className="text-lg font-medium text-white">Account & Sync</h2>
-          <p className="text-sm text-white/50">Manage your identity and synchronize your offline vault.</p>
-        </div>
-        <div className={cn(
-          "bg-[#111] border border-white/5 p-6 flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6",
-           uiStyle === 'roundy' ? 'rounded-3xl' : uiStyle === 'smooth' ? 'rounded-2xl' : 'rounded-lg'
-        )}>
-           {user ? (
-             <>
-               <div className="flex items-center gap-4 w-full">
-                 {user.photoURL ? (
-                    <img src={user.photoURL} alt="avatar" className="w-16 h-16 rounded-2xl object-cover shrink-0" />
-                 ) : (
-                    <div className="w-16 h-16 rounded-2xl bg-[var(--color-accent)] shrink-0 flex items-center justify-center text-black font-bold text-2xl uppercase">
-                      {user.displayName?.charAt(0) || user.email?.charAt(0) || "U"}
-                    </div>
-                 )}
-                 <div className="flex flex-col overflow-hidden w-full">
-                    <span className="text-white font-bold text-lg truncate">{user.displayName || "User"}</span>
-                    <span className="text-white/50 text-sm truncate">{user.email}</span>
-                    <div className="flex items-center gap-4 mt-2">
-                      <div className="flex items-center gap-1.5 text-white/40 text-xs font-bold uppercase tracking-widest"><Clock className="w-3.5 h-3.5" /> {localHistoryCount} History</div>
-                    </div>
-                 </div>
-               </div>
-               <button onClick={signOut} className="flex items-center justify-center gap-2 px-6 py-3 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-xl transition-colors font-bold text-xs uppercase tracking-widest self-stretch sm:self-center shrink-0">
-                 <LogOut className="w-4 h-4" /> Sign Out
-               </button>
-             </>
-           ) : (
-             <div className="flex flex-col gap-4 w-full items-center text-center">
-                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-2">
-                  <LogIn className="w-8 h-8 text-white/40" />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <h3 className="text-white font-bold">Sign In to sync data on cloud</h3>
-                  <p className="text-white/50 text-xs max-w-sm">Sync your history, offline vault, and customized theme across all your devices seamlessly.</p>
-                </div>
-                <button onClick={signInWithGoogle} className="mt-2 flex items-center justify-center gap-2 px-8 py-3 bg-white text-black hover:bg-white/90 rounded-full transition-colors font-bold text-xs uppercase tracking-widest">
-                  Sign in with Google
-                </button>
-             </div>
-           )}
-        </div>
-      </section>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         
@@ -231,9 +184,6 @@ export default function Settings() {
               </div>
             </div>
           </section>
-
-          {/* Integration Settings */}
-          {/* OTV/OMDb moved to environment variables */}
           
           <div className="flex items-start gap-3 p-4 bg-yellow-500/10 rounded-2xl border border-yellow-500/20 text-yellow-500 mt-4">
             <ShieldAlert className="w-5 h-5 shrink-0" />

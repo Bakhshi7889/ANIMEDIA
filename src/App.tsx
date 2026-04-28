@@ -1,8 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect, lazy, Suspense } from "react";
 import Layout from "./components/Layout";
-import { useAuth } from "./lib/firebase";
-import { syncUserData } from "./lib/storage";
 import InstallPrompt from "./components/InstallPrompt";
 
 import Home from "./pages/Home";
@@ -23,14 +21,7 @@ const PageLoader = () => (
 );
 
 export default function App() {
-  const { user } = useAuth();
   
-  useEffect(() => {
-    if (user) {
-      syncUserData();
-    }
-  }, [user]);
-
   useEffect(() => {
     const applySettings = () => {
       const color = localStorage.getItem('animedia_color') || 'facc15';

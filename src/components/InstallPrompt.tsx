@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Share, ChevronUp, PlusSquare, Download } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const InstallPrompt = () => {
   const [isVisible, setIsVisible] = useState(false);

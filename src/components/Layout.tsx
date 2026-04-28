@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Search, Home, Heart, CalendarClock, TrendingUp, Settings, HelpCircle, Film, Bell, Play, User, LogIn, Flame } from "lucide-react";
-import { useAuth, signInWithGoogle } from "../lib/firebase";
 import { cn } from "../lib/utils";
 
 export default function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const user = null;
 
   const isDetailsOrPlay = location.pathname.startsWith('/details') || location.pathname.startsWith('/play') || location.pathname.startsWith('/actor');
 
@@ -146,26 +145,6 @@ export default function Layout() {
             <button className="w-12 h-12 rounded-full bg-[#1a2226] border border-white/5 flex items-center justify-center shrink-0 text-[#959ca3] hover:text-white transition-colors">
               <Bell className="w-5 h-5" />
             </button>
-            {user ? (
-               <div onClick={() => navigate('/settings')} className="flex items-center gap-3 bg-[#1a2226] p-1.5 pr-4 rounded-full border border-white/5 shrink-0 cursor-pointer hover:bg-[#20292f] transition-colors">
-                  {user.photoURL ? (
-                    <img src={user.photoURL} alt={user.displayName || "Avatar"} className="w-9 h-9 rounded-full bg-orange-200 object-cover" />
-                  ) : (
-                    <div className="w-9 h-9 rounded-full bg-[var(--color-accent)] flex items-center justify-center font-bold text-black uppercase">
-                      {user.displayName?.charAt(0) || user.email?.charAt(0) || "U"}
-                    </div>
-                  )}
-                  <div className="hidden sm:flex flex-col">
-                     <span className="text-sm font-medium leading-none truncate max-w-[100px]">{user.displayName || "User"}</span>
-                     <span className="text-[10px] text-[var(--color-accent)] font-medium text-opacity-80">Premium</span>
-                  </div>
-               </div>
-            ) : (
-               <div onClick={signInWithGoogle} className="flex items-center justify-center gap-2 bg-[#1a2226] px-5 h-12 rounded-full border border-white/5 shrink-0 cursor-pointer hover:bg-[#20292f] transition-colors">
-                  <LogIn className="w-4 h-4 text-[#959ca3]" />
-                  <span className="text-sm font-medium text-white whitespace-nowrap">Sign In</span>
-               </div>
-            )}
           </div>
         </header>
 
@@ -177,23 +156,6 @@ export default function Layout() {
                    <span className="font-bold text-xl tracking-tight text-white drop-shadow-md">Animedia</span>
                    <span className="text-[8px] font-black uppercase tracking-widest text-[var(--color-accent)] border border-[var(--color-accent)] px-1.5 py-0.5 rounded-sm bg-[var(--color-accent)]/10 backdrop-blur-sm">Alpha</span>
                 </div>
-             </div>
-             <div className="pointer-events-auto">
-               {user ? (
-                 <div onClick={() => navigate('/settings')} className="cursor-pointer border-2 border-transparent hover:border-white/20 rounded-full transition-all">
-                    {user.photoURL ? (
-                       <img src={user.photoURL} alt="avatar" className="w-10 h-10 rounded-full object-cover" />
-                    ) : (
-                       <div className="w-10 h-10 rounded-full bg-[var(--color-accent)] flex items-center justify-center font-bold text-black uppercase">
-                         {user.displayName?.charAt(0) || user.email?.charAt(0) || "U"}
-                       </div>
-                    )}
-                 </div>
-               ) : (
-                 <button onClick={signInWithGoogle} className="bg-white/10 backdrop-blur-xl p-2 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-white/20 transition-all text-white flex items-center justify-center">
-                    <LogIn className="w-4 h-4" />
-                 </button>
-               )}
              </div>
           </header>
         )}

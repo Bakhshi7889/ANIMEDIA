@@ -4,8 +4,7 @@ import { ArrowLeft, Settings, Maximize, X, Download, Ear, Film, Server } from "l
 import { saveProgress } from "../lib/storage";
 import { getDetails, getTvSeasons, type TMDBMovie, getImageUrl } from "../services/tmdb";
 import { cn } from "../lib/utils";
-import LiveChat from "../components/LiveChat";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence } from "framer-motion";
 import Hls from "hls.js";
 import CachedImage from "../components/CachedImage";
 
@@ -122,7 +121,6 @@ export default function Player() {
     }, 300);
   };
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'episodes' | 'chat'>('chat');
 
   useEffect(() => {
     if (!details && id) {
@@ -375,32 +373,9 @@ export default function Player() {
 
         {/* Sidebar */}
         <div className={cn("w-full xl:w-[400px] flex flex-col gap-4 group/sidebar", isFullscreen && "hidden")}>
-          <div className="flex items-center gap-2 bg-[#111111] border border-white/5 p-1.5 rounded-3xl shrink-0 backdrop-blur-3xl shadow-xl">
-             <button 
-               onClick={() => setActiveTab('episodes')}
-               className={cn("flex-1 py-3 text-[10px] uppercase tracking-widest font-black rounded-2xl transition-all relative overflow-hidden", activeTab === 'episodes' ? "bg-white/10 text-white" : "text-white/30 hover:text-white/60")}
-             >
-               {activeTab === 'episodes' && <motion.div layoutId="tab-bg" className="absolute inset-0 bg-white/5" />}
-               <span className="relative z-10">{type === 'tv' ? 'Episodes' : 'Specs'}</span>
-             </button>
-             <button 
-               onClick={() => setActiveTab('chat')}
-               className={cn("flex-1 py-3 text-[10px] uppercase tracking-widest font-black rounded-2xl transition-all relative overflow-hidden", activeTab === 'chat' ? "bg-[var(--color-accent)] text-black" : "text-white/30 hover:text-white/60")}
-             >
-                {activeTab === 'chat' && <motion.div layoutId="tab-bg" className="absolute inset-0 bg-black/10" />}
-                <span className="relative z-10">Live Feed</span>
-             </button>
-          </div>
-
           <div className="flex-1 flex flex-col min-h-[500px]">
-            <AnimatePresence mode="wait">
-              {activeTab === 'chat' ? (
-                <motion.div key="chat" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex-1">
-                  <LiveChat mediaId={type === 'tv' ? `tv_${id}_s${activeSeason}_e${activeEpisode}` : `movie_${id}`} currentTimeMs={0} />
-                </motion.div>
-              ) : (
-                <motion.div key="episodes" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex-1 flex flex-col gap-4 bg-[#111] p-5 pt-8 rounded-[2.5rem] border border-white/5 max-h-[800px] overflow-y-auto no-scrollbar shadow-2xl backdrop-blur-3xl relative z-10">
-                  {type === 'tv' ? (
+            <div className="flex-1 flex flex-col gap-4 bg-[#111] p-5 pt-8 rounded-[2.5rem] border border-white/5 max-h-[800px] overflow-y-auto no-scrollbar shadow-2xl backdrop-blur-3xl relative z-10">
+              {type === 'tv' ? (
                     <>
                       <div className="flex items-center gap-3 overflow-x-auto pb-4 pt-2 no-scrollbar border-b border-white/5 px-2 -mx-2 relative z-20">
                         {validSeasons.map((season, sIdx) => (
@@ -456,9 +431,7 @@ export default function Player() {
                        <span className="text-[10px] uppercase font-black tracking-widest text-white/20 italic">Recommendation logic calibrating...</span>
                     </div>
                   )}
-                </motion.div>
-              )}
-            </AnimatePresence>
+            </div>
           </div>
         </div>
       </div>

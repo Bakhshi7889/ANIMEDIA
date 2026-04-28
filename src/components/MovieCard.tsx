@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { type TMDBMovie, getImageUrl } from "../services/tmdb";
 import { Play } from "lucide-react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import CachedImage from "./CachedImage";
 
 interface MovieCardProps {
