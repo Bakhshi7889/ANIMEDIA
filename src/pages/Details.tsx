@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { getDetails, getTvSeasons, type TMDBMovie, getImageUrl } from "../services/tmdb";
-import { Play, ArrowLeft, Heart, Ticket, Clock, Star, Info } from "lucide-react";
-import { isFavorite, toggleFavorite, getProgress, WatchProgress } from "../lib/storage";
+import { Play, ArrowLeft, Heart, Ticket, Clock, Star, Info, Check, Eye, Bookmark } from "lucide-react";
+import { isFavorite, toggleFavorite, getProgress, type WatchProgress, getWatchListStatus, setWatchListStatus, type WatchStatus } from "../lib/storage";
 import { FastAverageColor } from 'fast-average-color';
 import { getOmdbDetails, type OMDbDetails } from "../services/omdb";
 import CachedImage from "../components/CachedImage";
@@ -16,6 +16,7 @@ export default function Details() {
   const [watchProgress, setWatchProgress] = useState<WatchProgress | null>(null);
   const [dominantColor, setDominantColor] = useState<string>('#0e1518');
   const [omdbData, setOmdbData] = useState<OMDbDetails | null>(null);
+  const [watchStatus, setWatchStatus] = useState<WatchStatus | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -52,12 +53,14 @@ export default function Details() {
           }
         }
 
-        const [favStatus, progress] = await Promise.all([
+        const [favStatus, progress, wStatus] = await Promise.all([
           isFavorite(id),
-          getProgress(id)
+          getProgress(id),
+          getWatchListStatus(id)
         ]);
         
         setFavorite(favStatus);
+        setWatchStatus(wStatus || null);
         
         if (progress && progress.progress > 0 && progress.progress < 95) {
           setWatchProgress(progress);
@@ -76,6 +79,14 @@ export default function Details() {
     if (!data) return;
     const newStatus = await toggleFavorite(data);
     setFavorite(newStatus);
+  };
+
+  const handleWatchStatus = async (status: WatchStatus | null) => {
+    if (!data) return;
+    // if clicking the currently active status, clear it
+    const newStatus = watchStatus === status ? null : status;
+    await setWatchListStatus(data, newStatus);
+    setWatchStatus(newStatus);
   };
 
   const handlePlayClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -331,6 +342,34 @@ export default function Details() {
             <span className="text-red-500 font-bold">▶</span>
             Watch Trailer
           </a>
+        </div>
+
+        {/* Watch Status Selector */}
+        <div className="flex flex-col gap-3 mt-4 w-full">
+          <span className="text-sm font-semibold text-white/50 uppercase tracking-widest text-center landscape:text-left md:text-left">Your List</span>
+          <div className="flex flex-wrap items-center justify-center landscape:justify-start md:justify-start gap-3 w-full">
+            <button 
+              onClick={() => handleWatchStatus('plan_to_watch')}
+              className={`flex-1 min-w-[120px] landscape:flex-none flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all border ${watchStatus === 'plan_to_watch' ? 'bg-blue-500/20 text-blue-400 border-blue-500/50' : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:border-white/20'}`}
+            >
+              <Bookmark className="w-4 h-4" />
+              Plan to Watch
+            </button>
+            <button 
+              onClick={() => handleWatchStatus('watching')}
+              className={`flex-1 min-w-[120px] landscape:flex-none flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all border ${watchStatus === 'watching' ? 'bg-amber-500/20 text-amber-400 border-amber-500/50' : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:border-white/20'}`}
+            >
+              <Eye className="w-4 h-4" />
+              Watching
+            </button>
+            <button 
+              onClick={() => handleWatchStatus('completed')}
+              className={`flex-1 min-w-[120px] landscape:flex-none flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider transition-all border ${watchStatus === 'completed' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:border-white/20'}`}
+            >
+              <Check className="w-4 h-4" />
+              Completed
+            </button>
+          </div>
         </div>
 
         {/* X-Ray Cast Section */}

@@ -5,7 +5,7 @@ import MovieCard from "../components/MovieCard";
 import { MovieCardSkeleton } from "../components/Skeleton";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { cn } from "../lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import CachedImage from "../components/CachedImage";
 
 // A hook to use query params

@@ -1,25 +1,29 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getFavorites, getRecentlyWatched, WatchProgress } from "../lib/storage";
+import { getFavorites, getRecentlyWatched, WatchProgress, getAllWatchList, WatchListItem } from "../lib/storage";
 import { TMDBMovie } from "../services/tmdb";
 import MovieCard from "../components/MovieCard";
-import { Download, Play } from "lucide-react";
+import { Download, Play, Heart, Bookmark, Eye, Check } from "lucide-react";
 
 export default function Library() {
   const [favorites, setFavorites] = useState<TMDBMovie[]>([]);
+  const [watchList, setWatchList] = useState<WatchListItem[]>([]);
   const [recentlyWatched, setRecentlyWatched] = useState<WatchProgress[]>([]);
   const [downloads, setDownloads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'favorites' | 'plan_to_watch' | 'watching' | 'completed'>('favorites');
 
   useEffect(() => {
     async function loadLibrary() {
       try {
-        const [favs, recent] = await Promise.all([
+        const [favs, recent, wList] = await Promise.all([
           getFavorites(),
-          getRecentlyWatched(20)
+          getRecentlyWatched(20),
+          getAllWatchList()
         ]);
         setFavorites(favs.reverse());
         setRecentlyWatched(recent);
+        setWatchList(wList.reverse());
         
         try {
           const down = JSON.parse(localStorage.getItem('animedia_downloads') || "[]");
@@ -93,18 +97,68 @@ export default function Library() {
         </section>
       )}
 
-      <section className="flex flex-col gap-8">
-        <h1 className="text-4xl font-serif font-light">My Favorites</h1>
-        {favorites.length === 0 ? (
-          <div className="text-white/50 italic py-8 border border-dashed border-white/10 rounded-2xl flex items-center justify-center text-sm">
-            You haven't added any favorites yet.
+      <section className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
+          <h1 className="text-4xl font-serif font-light">Your Lists</h1>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setActiveTab('favorites')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold tracking-widest uppercase transition-colors ${activeTab === 'favorites' ? 'bg-white text-black' : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white'}`}
+            >
+              <Heart className="w-4 h-4" /> Favorites
+            </button>
+            <button
+              onClick={() => setActiveTab('plan_to_watch')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold tracking-widest uppercase transition-colors ${activeTab === 'plan_to_watch' ? 'bg-blue-500 text-white' : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white'}`}
+            >
+              <Bookmark className="w-4 h-4" /> Plan to Watch
+            </button>
+            <button
+              onClick={() => setActiveTab('watching')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold tracking-widest uppercase transition-colors ${activeTab === 'watching' ? 'bg-amber-500 text-white' : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white'}`}
+            >
+              <Eye className="w-4 h-4" /> Watching
+            </button>
+            <button
+              onClick={() => setActiveTab('completed')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold tracking-widest uppercase transition-colors ${activeTab === 'completed' ? 'bg-emerald-500 text-white' : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white'}`}
+            >
+              <Check className="w-4 h-4" /> Completed
+            </button>
           </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-4 gap-y-10">
-            {favorites.map((m, index) => (
-              <MovieCard key={m.id + '-' + index} movie={m} />
-            ))}
-          </div>
+        </div>
+
+        {/* Dynamic List Content */}
+        {activeTab === 'favorites' && (
+          <>
+            {favorites.length === 0 ? (
+              <div className="text-white/50 italic py-8 border border-dashed border-white/10 rounded-2xl flex items-center justify-center text-sm">
+                You haven't added any favorites yet.
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-4 gap-y-10">
+                {favorites.map((m, index) => (
+                  <MovieCard key={m.id + '-' + index} movie={m} />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {activeTab !== 'favorites' && (
+          <>
+            {watchList.filter(item => item.status === activeTab).length === 0 ? (
+              <div className="text-white/50 italic py-8 border border-dashed border-white/10 rounded-2xl flex items-center justify-center text-sm">
+                Your list is empty.
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-4 gap-y-10">
+                {watchList.filter(item => item.status === activeTab).map((item, index) => (
+                  <MovieCard key={item.id + '-' + index} movie={item.movie} />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </section>
 

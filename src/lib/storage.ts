@@ -19,6 +19,15 @@ interface CachedImage {
   lastUsed: number;
 }
 
+export type WatchStatus = 'watching' | 'completed' | 'plan_to_watch' | 'dropped';
+
+export interface WatchListItem {
+  id: string;
+  movie: TMDBMovie;
+  status: WatchStatus;
+  updatedAt: number;
+}
+
 interface AnimediaDB extends DBSchema {
   favorites: {
     key: string;
@@ -34,10 +43,15 @@ interface AnimediaDB extends DBSchema {
     value: CachedImage;
     indexes: { 'by-lastUsed': number };
   };
+  watchList: {
+    key: string;
+    value: WatchListItem;
+    indexes: { 'by-updatedAt': number, 'by-status': WatchStatus };
+  };
 }
 
 const DB_NAME = 'animedia-db';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 export async function initDB() {
   return openDB<AnimediaDB>(DB_NAME, DB_VERSION, {
@@ -55,6 +69,13 @@ export async function initDB() {
         if (!db.objectStoreNames.contains('imageCache')) {
           const imageStore = db.createObjectStore('imageCache', { keyPath: 'url' });
           imageStore.createIndex('by-lastUsed', 'lastUsed');
+        }
+      }
+      if (oldVersion < 3) {
+        if (!db.objectStoreNames.contains('watchList')) {
+          const watchListStore = db.createObjectStore('watchList', { keyPath: 'id' });
+          watchListStore.createIndex('by-updatedAt', 'updatedAt');
+          watchListStore.createIndex('by-status', 'status');
         }
       }
     },
@@ -127,4 +148,39 @@ export async function getRecentlyWatched(limitCount = 10): Promise<WatchProgress
   }
   
   return results;
+}
+
+// --- Watch List ---
+export async function getWatchListStatus(id: string | number): Promise<WatchStatus | undefined> {
+  const localDb = await initDB();
+  const item = await localDb.get('watchList', String(id));
+  return item?.status;
+}
+
+export async function setWatchListStatus(movie: TMDBMovie, status: WatchStatus | null): Promise<void> {
+  const localDb = await initDB();
+  const idStr = String(movie.id);
+  
+  if (!status) {
+    await localDb.delete('watchList', idStr);
+  } else {
+    await localDb.put('watchList', {
+      id: idStr,
+      movie,
+      status,
+      updatedAt: Date.now()
+    });
+  }
+}
+
+export async function getWatchListByStatus(status: WatchStatus): Promise<WatchListItem[]> {
+  const localDb = await initDB();
+  const tx = localDb.transaction('watchList', 'readonly');
+  const index = tx.store.index('by-status');
+  return index.getAll(status);
+}
+
+export async function getAllWatchList(): Promise<WatchListItem[]> {
+  const localDb = await initDB();
+  return localDb.getAll('watchList');
 }

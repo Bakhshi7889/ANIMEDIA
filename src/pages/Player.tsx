@@ -4,7 +4,7 @@ import { ArrowLeft, Settings, Maximize, X, Download, Ear, Film, Server } from "l
 import { saveProgress } from "../lib/storage";
 import { getDetails, getTvSeasons, type TMDBMovie, getImageUrl } from "../services/tmdb";
 import { cn } from "../lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import Hls from "hls.js";
 import CachedImage from "../components/CachedImage";
 
