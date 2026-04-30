@@ -59,7 +59,7 @@ const InstallPrompt = () => {
         >
           <div className="bg-[#111111] border border-[rgba(255,255,255,0.08)] rounded-[20px] p-4 flex items-center justify-between shadow-2xl">
             <div className="flex items-center gap-3">
-              <img src="./icons/icon-192.png" alt="App Icon" className="w-8 h-8 rounded-lg" />
+              <img src="/icons/icon-192.png" alt="App Icon" className="w-8 h-8 rounded-lg" />
               <div className='flex flex-col'>
                 <h3 className="text-sm font-bold text-white">Animedia</h3>
                 <span className="text-[10px] text-white/50 tracking-widest uppercase">Add to Home Screen</span>

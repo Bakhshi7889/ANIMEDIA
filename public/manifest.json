@@ -1,41 +1,25 @@
 {
-  "name": "Animedia | Private Streaming",
+  "name": "Animedia",
   "short_name": "Animedia",
   "description": "Premium Private Cinematic Experience",
-  "start_url": "/",
-  "id": "/?pwa=1",
-  "scope": "/",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#050505",
-  "theme_color": "#050505",
+  "orientation": "portrait",
+  "background_color": "#000000",
+  "theme_color": "#facc15",
   "icons": [
     {
-      "src": "/Picsart_26-04-25_20-39-47-646.png",
+      "src": "./icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/Picsart_26-04-25_20-41-11-014.png",
+      "src": "./icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/Picsart_26-04-25_20-41-11-014.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Home Screen Desktop"
-    },
-    {
-      "src": "/Picsart_26-04-25_20-41-11-014.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Home Screen Mobile"
     }
   ]
 }

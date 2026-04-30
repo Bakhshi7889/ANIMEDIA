@@ -1,11 +1,22 @@
 import { ShieldAlert, Check } from "lucide-react";
 import { cn } from "../lib/utils";
 import { useSettings } from "../context/SettingsContext";
+import { motion } from "framer-motion";
 
 const ANIMATION_INTENSITIES = [
   { id: 'simple', name: 'Simple' },
   { id: 'balanced', name: 'Balanced' },
   { id: 'luxurious', name: 'Luxurious' },
+];
+
+const COLORS = [
+  { id: 'facc15', name: 'Classic Yellow', hex: '#facc15' },
+  { id: 'ffffff', name: 'Classic White', hex: '#ffffff' },
+  { id: '0dcaf0', name: 'Ocean Blue', hex: '#0dcaf0' },
+  { id: 'e50914', name: 'Cinema Red', hex: '#e50914' },
+  { id: '9146ff', name: 'Neon Purple', hex: '#9146ff' },
+  { id: '1DB954', name: 'Emerald', hex: '#1DB954' },
+  { id: 'FF6321', name: 'Vibrant Orange', hex: '#FF6321' }
 ];
 
 const CAPTION_LANGUAGES = [
@@ -21,10 +32,13 @@ export default function Settings() {
   
   return (
     <div className="px-6 flex flex-col gap-12 max-w-4xl mx-auto pb-24 border-none outline-none">
-      <div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
         <h1 className="text-4xl font-serif font-light text-white tracking-wide">Settings</h1>
         <p className="text-white/50 mt-2">Customize your premium streaming experience.</p>
-      </div>
+      </motion.div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         
@@ -47,10 +61,10 @@ export default function Settings() {
                     settings.captionsEnabled ? "bg-white" : "bg-white/20"
                   )}
                 >
-                  <div className={cn(
-                    "w-4 h-4 rounded-full bg-black absolute transition-all duration-300",
-                    settings.captionsEnabled ? "translate-x-7" : "translate-x-1"
-                  )} />
+                  <motion.div 
+                    animate={{ x: settings.captionsEnabled ? 28 : 4 }}
+                    className="w-4 h-4 rounded-full bg-black transition-all"
+                  />
                 </button>
               </div>
 
@@ -108,16 +122,46 @@ export default function Settings() {
               <h2 className="text-lg font-medium text-white">Player Accent Color</h2>
               <p className="text-sm text-white/50">Overrides the media player timeline and controls.</p>
             </div>
-            <div className="bg-[#111] border border-white/5 p-6 flex flex-col gap-4 rounded-2xl">
-              <div className="flex items-center gap-4">
-                <input 
-                  type="color" 
-                  value={`#${settings.accentColor.replace('#', '')}`}
-                  onChange={(e) => updateSettings({ accentColor: e.target.value.replace('#', '') })}
-                  className="w-16 h-16 rounded-2xl cursor-pointer border-none bg-transparent"
-                />
+            <div className="bg-[#111] border border-white/5 p-6 flex flex-col gap-6 rounded-2xl">
+              <div className="flex flex-wrap gap-3">
+                {COLORS.map(c => (
+                  <button
+                    key={c.id}
+                    onClick={() => updateSettings({ accentColor: c.id })}
+                    className={cn(
+                      "w-10 h-10 rounded-full transition-all flex items-center justify-center relative overflow-hidden group",
+                      settings.accentColor === c.id ? "ring-2 ring-white scale-110" : "hover:scale-110 opacity-70 hover:opacity-100"
+                    )}
+                    style={{ backgroundColor: c.hex }}
+                    title={c.name}
+                  >
+                     {settings.accentColor === c.id && (
+                       <motion.div 
+                        layoutId="activeColor"
+                        className='w-10 h-10 rounded-full bg-white/20 flex items-center justify-center'
+                       >
+                         <div className="w-2 h-2 rounded-full bg-black shadow-sm" />
+                       </motion.div>
+                     )}
+                     <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </button>
+                ))}
+              </div>
+              <div className="pt-4 border-t border-white/10 flex items-center gap-4">
+                <div className="relative w-12 h-12">
+                  <input 
+                    type="color" 
+                    value={`#${settings.accentColor.replace('#', '')}`}
+                    onChange={(e) => updateSettings({ accentColor: e.target.value.replace('#', '') })}
+                    className="absolute inset-0 w-full h-full rounded-full cursor-pointer border-none bg-transparent appearance-none"
+                  />
+                  <div 
+                    className="w-12 h-12 rounded-full border border-white/20 pointer-events-none" 
+                    style={{ backgroundColor: `#${settings.accentColor}` }}
+                  />
+                </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-sm text-white/50">Hex Color</span>
+                  <span className="text-sm text-white/50">Custom Hex</span>
                   <span className="text-lg font-mono text-white">#{settings.accentColor}</span>
                 </div>
               </div>

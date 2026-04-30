@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { getDetails, getTvSeasons, type TMDBMovie, getImageUrl } from "../services/tmdb";
-import { Play, ArrowLeft, Heart, Ticket, Clock, Star, Info, Check, Eye, Bookmark } from "lucide-react";
+import { Play, ArrowLeft, Heart, Ticket, Clock, Star, Info, Check, Eye, Bookmark, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { isFavorite, toggleFavorite, getProgress, type WatchProgress, getWatchListStatus, setWatchListStatus, type WatchStatus } from "../lib/storage";
 import { FastAverageColor } from 'fast-average-color';
 import { getOmdbDetails, type OMDbDetails } from "../services/omdb";
@@ -17,6 +18,8 @@ export default function Details() {
   const [dominantColor, setDominantColor] = useState<string>('#0e1518');
   const [omdbData, setOmdbData] = useState<OMDbDetails | null>(null);
   const [watchStatus, setWatchStatus] = useState<WatchStatus | null>(null);
+  const [trailerKey, setTrailerKey] = useState<string | null>(null);
+  const [showTrailer, setShowTrailer] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -25,6 +28,12 @@ export default function Details() {
         const details = await getDetails(id, type as any);
         setData(details);
         
+        // Find trailer
+        const trailer = details.videos?.results?.find(
+          (video: any) => video.site === 'YouTube' && video.type === 'Trailer'
+        );
+        if (trailer) setTrailerKey(trailer.key);
+
         // Try to fetch omdb details if we have an IMDB ID
         const imdbId = details.imdb_id || details.external_ids?.imdb_id;
         if (imdbId) {
@@ -136,14 +145,47 @@ export default function Details() {
       className="relative min-h-screen flex flex-col transition-colors duration-1000"
       style={{ '--color-dominant': dominantColor } as React.CSSProperties}
     >
+      {/* Trailer Overlay */}
+      <AnimatePresence>
+        {showTrailer && trailerKey && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 backdrop-blur-md"
+          >
+            <motion.button 
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              onClick={() => setShowTrailer(false)}
+              className="absolute top-6 right-6 text-white hover:text-white/70 bg-white/10 p-2 rounded-full backdrop-blur-md transition-colors"
+            >
+              <X className="w-8 h-8" />
+            </motion.button>
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="w-full max-w-5xl aspect-video px-4"
+            >
+              <iframe 
+                src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1`}
+                className="w-full h-full rounded-3xl shadow-2xl border border-white/10"
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Mobile-First Header */}
       <div className="sticky top-0 z-[100] px-6 py-4 pt-12 pt-safe flex items-center justify-between bg-[#050505]/40 backdrop-blur-xl border-b border-white/5 landscape:hidden md:hidden">
         <button 
-          onClick={() => window.history.length > 2 ? navigate(-1) : navigate('/')}
-          className="flex items-center gap-2 text-white/70 hover:text-white transition-colors"
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 text-white hover:text-white/70 transition-colors"
         >
-          <ArrowLeft className="w-5 h-5" />
-          <span className="font-black text-[10px] uppercase tracking-widest leading-none">Back</span>
+          <ArrowLeft className="w-6 h-6" />
+          <span className="font-bold text-xs uppercase tracking-tighter leading-none">Back</span>
         </button>
         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20">Preview Mode</span>
       </div>
@@ -155,23 +197,39 @@ export default function Details() {
       />
       
       {/* Background (Desktop) */}
-      <div className="hidden landscape:block md:block absolute inset-0 z-0">
+      <div className="hidden landscape:block md:block absolute inset-0 z-0 overflow-hidden">
         <div className="absolute inset-0 bg-[#0e1518]/60 z-10" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0e1518] via-transparent to-transparent z-10" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#0e1518] via-[#0e1518]/80 to-transparent z-10" />
-        {bgUrl && (
+        {trailerKey ? (
+          <div className="absolute inset-0 w-full h-full scale-[1.3] pointer-events-none">
+            <iframe 
+              src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&controls=0&loop=1&playlist=${trailerKey}&rel=0&showinfo=0&modestbranding=1`}
+              className="w-full h-full object-cover"
+              allow="autoplay; encrypted-media"
+            />
+          </div>
+        ) : bgUrl ? (
           <CachedImage 
             src={bgUrl} 
             alt="backdrop" 
             type="movie"
             className="w-full h-full object-cover opacity-30"
           />
-        )}
+        ) : null}
       </div>
 
       {/* Mobile Top Image (Purrweb style) */}
-      <div className="landscape:hidden md:hidden relative w-full h-[45vh] shrink-0 border-b border-white/5">
-         {bgUrl ? (
+      <div className="landscape:hidden md:hidden relative w-full h-[45vh] shrink-0 border-b border-white/5 overflow-hidden">
+         {trailerKey ? (
+            <div className="absolute inset-0 w-full h-full scale-[1.5] pointer-events-none">
+              <iframe 
+                src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&controls=0&loop=1&playlist=${trailerKey}&rel=0&showinfo=0&modestbranding=1`}
+                className="w-full h-full object-cover"
+                allow="autoplay; encrypted-media"
+              />
+            </div>
+         ) : bgUrl ? (
             <CachedImage 
               src={bgUrl} 
               alt="backdrop" 
@@ -202,10 +260,11 @@ export default function Details() {
       <div className="relative z-20 flex-1 px-6 landscape:px-12 md:px-12 py-8 landscape:py-12 md:py-12 flex flex-col justify-center w-full max-w-4xl gap-8 landscape:gap-8 md:gap-8 mx-auto landscape:mx-0 md:mx-0 items-center text-center landscape:items-start md:items-start landscape:text-left md:text-left">
         
         <button 
-          onClick={() => window.history.length > 2 ? navigate(-1) : navigate('/')}
+          onClick={() => navigate('/')}
           className="hidden landscape:flex md:flex items-center gap-2 text-white/50 hover:text-white self-start transition-colors z-30 mb-4"
         >
-          <ArrowLeft className="w-4 h-4" /> Back
+          <ArrowLeft className="w-5 h-5" />
+          <span className="font-bold text-xs uppercase tracking-tighter">Back</span>
         </button>
 
         <div className="flex flex-col gap-2 landscape:gap-4 md:gap-4 items-center landscape:items-start md:items-start">
@@ -333,15 +392,15 @@ export default function Details() {
               Watch Now
             </button>
           )}
-          <a 
-            href={`https://www.youtube.com/results?search_query=${encodeURIComponent((data.title || data.name) + " official trailer")}`}
-            target="_blank"
-            rel="noreferrer"
-            className="group w-full landscape:w-auto flex items-center justify-center gap-3 bg-white/5 text-white border border-white/10 px-8 py-4 rounded-full font-bold hover:bg-white/10 hover:border-white/20 transition-all active:scale-95 shadow-lg"
-          >
-            <span className="text-red-500 font-bold">▶</span>
-            Watch Trailer
-          </a>
+          {trailerKey && (
+            <button 
+              onClick={() => setShowTrailer(true)}
+              className="group w-full landscape:w-auto flex items-center justify-center gap-3 bg-white/5 text-white border border-white/10 px-8 py-4 rounded-full font-bold hover:bg-white/10 hover:border-white/20 transition-all active:scale-95 shadow-lg"
+            >
+              <span className="text-red-500 font-bold">▶</span>
+              Watch Trailer
+            </button>
+          )}
         </div>
 
         {/* Watch Status Selector */}

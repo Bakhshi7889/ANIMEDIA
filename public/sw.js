@@ -1,79 +1,31 @@
-const CACHE_NAME = 'animedia-v2';
-const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/Picsart_26-04-25_20-39-47-646.png',
-  '/Picsart_26-04-25_20-41-11-014.png'
+const CACHE_NAME = 'animedia-v1';
+
+const ASSETS = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
 ];
 
-self.addEventListener('install', (event) => {
+self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
   );
   self.skipWaiting();
 });
 
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME && key !== 'tmdb-images').map((key) => caches.delete(key))
-      );
-    }).then(() => self.clients.claim())
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+    )
   );
+  self.clients.claim();
 });
 
-self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  const url = new URL(request.url);
-
-  if (!url.protocol.startsWith('http')) {
-    return;
-  }
-
-  if (request.method !== 'GET') {
-    return;
-  }
-
-  // Network First with Cache Fallback for navigation requests
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request)
-        .then((networkResponse) => {
-          return caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, networkResponse.clone());
-            return networkResponse;
-          });
-        })
-        .catch(() => {
-          return caches.match('/index.html').then((cachedResponse) => {
-            return cachedResponse || new Response('Offline', { status: 503 });
-          });
-        })
-    );
-    return;
-  }
-
-  // Only cache same-origin GET requests (HTML, JS, CSS, assets)
-  if (url.origin !== location.origin) {
-    return;
-  }
-
-  // For other requests, use stale-while-revalidate
+self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(request).then((cachedResponse) => {
-      const fetchPromise = fetch(request).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200) {
-          const cacheCopy = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, cacheCopy);
-          });
-        }
-        return networkResponse;
-      }).catch(() => null);
-      
-      return cachedResponse || fetchPromise || new Response('', { status: 404 });
-    })
+    caches.match(event.request).then(cached => cached || fetch(event.request))
   );
 });
