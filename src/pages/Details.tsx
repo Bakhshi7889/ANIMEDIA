@@ -98,7 +98,7 @@ export default function Details() {
     setWatchStatus(newStatus);
   };
 
-  const handlePlayClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handlePlayClick = (e: React.MouseEvent<HTMLElement>) => {
     // Pass the movie details via location state so Player can save it
     if (data) {
       navigate(`/play/${type}/${id}`, { state: { movieDetails: data } });
@@ -106,7 +106,7 @@ export default function Details() {
     }
   };
 
-  const handleResumeClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleResumeClick = (e: React.MouseEvent<HTMLElement>) => {
     if (data && watchProgress) {
       navigate(`/play/${type}/${id}?resume=${Math.floor(watchProgress.currentTime)}&season=${watchProgress.season || 1}&episode=${watchProgress.episode || 1}`, { state: { movieDetails: data } });
       e.preventDefault();
